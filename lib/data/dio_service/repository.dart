@@ -6,7 +6,7 @@ import '../response_model/body_login.dart';
 import '../response_structure/api_response.dart';
 import 'api_service.dart';
 
-class AuthRepository {
+class Repository {
   /// Login API -----------------
   static Future<ApiResponse<ResponseLogin>> getLogin(BodyLogin bodyLogin) async {
     try {
@@ -34,12 +34,48 @@ class AuthRepository {
 
         return ApiResponse(
           httpCode: e.response!.statusCode,
-          success: e.response!.data["result"],
           message: e.response!.data["message"],
           error: obj,
         );
       } else {
         EasyLoading.dismiss();
+        if (kDebugMode) {
+          print(e.message);
+        }
+        return ApiResponse(httpCode: -1, message: "Connection error ${e.message}");
+      }
+    }
+  }
+
+  ///store transaction to server
+  static Future<ApiResponse<String>> storeResultData(fromData) async {
+    try {
+      var response = await ApiService.getDio()!.post("/transaction", data: fromData);
+      if (response.statusCode == 200) {
+        if (kDebugMode) {
+          print(response.data);
+        }
+        var obj = response.data.toString();
+        return ApiResponse(
+            httpCode: response.statusCode,
+            data: obj);
+      } else {
+        var obj = response.data.toString();
+        return ApiResponse(
+            httpCode: response.statusCode,
+            data: obj);
+      }
+    } on DioError catch (e) {
+      if (e.type == DioErrorType.response) {
+        var obj = e.response?.data.toString();
+
+        return ApiResponse(
+          httpCode: e.response!.statusCode,
+          success: e.response!.data["result"],
+          message: e.response!.data["message"],
+          error: obj,
+        );
+      } else {
         if (kDebugMode) {
           print(e.message);
         }

@@ -9,4 +9,5 @@ class CashData{
   final String tImage;
 
   CashData({required this.cashType,required this.amount,required this.date,required this.tCode,required this.tImage});
+
 }

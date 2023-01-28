@@ -2,6 +2,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedUtils{
   static String keyService = "service";
+  static String keyBeneficiaryId = "beneficiary";
+  static String keyBeneficiaryPhone = "phone";
+  static String keyIsLoggedIn = 'isLoggedIn';
+  static String keyIsFirstTime = 'isFirstTime';
+  static String keySecond = 'isLoggedIn';
 
   static setValue(String key,String? value) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -38,13 +43,13 @@ class SharedUtils{
     }
   }
 
-  static Future<bool?> getBoolValue(String key) async {
+  static Future<bool> getBoolValue(String key,{bool defaultValue = false}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       var value = prefs.getBool(key);
-      return value;
+      return value ?? defaultValue;
     } catch (error) {
-      return null;
+      return defaultValue;
     }
   }
 

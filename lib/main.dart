@@ -1,4 +1,4 @@
-import 'package:bkash/pages/login_screen.dart';
+import 'package:bkash/pages/wrapper_screen.dart';
 import 'package:bkash/providers/sms_receiver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.deepPurple,
         ),
-        home: const LoginPage(),
+        home: const WrapperScreen(),
       ),
     );
   }

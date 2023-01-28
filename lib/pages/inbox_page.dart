@@ -17,10 +17,10 @@ class InboxPage extends StatefulWidget {
 class _InboxPageState extends State<InboxPage> {
   @override
   Widget build(BuildContext context) {
+
     final cashProvider = Provider.of<SMSReceiverProvider>(context);
 
     void _handleMenuItem(String value) async {
-      print(value);
       switch (value) {
         case 'bKash':
           await cashProvider.onServiceChanged(val: services.first);
@@ -33,6 +33,10 @@ class _InboxPageState extends State<InboxPage> {
           break;
       }
     }
+    ///store data from device to server if last stored
+    ///data-time is accessed threshold data-time(for
+    ///example after 5 days data will be updated)
+    cashProvider.dataStoreHelper();
 
     return DefaultTabController(
       length: 2,
