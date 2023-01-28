@@ -37,3 +37,9 @@ enum HomeMenu {
 
   const HomeMenu(this.title, this.icon, this.widget);
 }
+
+enum CashType{
+  cashIn,
+  cashOut,
+  unknown
+}

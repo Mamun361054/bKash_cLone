@@ -6,7 +6,7 @@ import 'package:barcode_scan2/platform_wrapper.dart';
 import 'package:bkash/pages/inbox_page.dart';
 import 'package:bkash/widgets/drawer_widget.dart';
 import 'package:bkash/widgets/home_body_widget.dart';
-import 'package:bkash/widgets/notifications_widget.dart';
+import 'package:bkash/widgets/cash_in_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
