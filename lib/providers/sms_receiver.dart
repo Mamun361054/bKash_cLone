@@ -144,34 +144,39 @@ class SMSReceiverProvider extends ChangeNotifier {
           str.contains('recharge') ||
           str.contains('payment')) {
         final amount = FetchDoubleFromString.retrieveAmountData(item.body!);
-        totalSend += amount;
-        final date = FetchDoubleFromString.retrieveDateData(item.body!);
-        cashOuts.add(CashData(
-            cashType: CashType.cashOut,
-            amount: amount,
-            date: date,
-            tCode: 0,
-            tImage: "assets/cash_out.jpg"));
+        if(amount.toString().length <= 5){
+          totalSend += amount;
+          final date = FetchDoubleFromString.retrieveDateData(item.body!);
+          cashOuts.add(CashData(
+              cashType: CashType.cashOut,
+              amount: amount,
+              date: date,
+              tCode: 0,
+              tImage: "assets/cash_out.jpg"));
+        }
       } else if (str.contains('sent') ||
           str.contains('received') ||
           str.contains('add') ||
           str.contains('cashback') ||
           str.contains('cash in')) {
-        double amount = 0.0;
+
+          double amount = 0.0;
+
         if (selectedService == "Nagad" && str.contains('sent')) {
-          amount = FetchDoubleFromString.retrieveAmountData(item.body!,
-              isSent: true);
+          amount = FetchDoubleFromString.retrieveAmountData(item.body!, isSent: true);
         } else {
           amount = FetchDoubleFromString.retrieveAmountData(item.body!);
         }
-        totalReceived += amount;
-        final date = FetchDoubleFromString.retrieveDateData(item.body!);
-        cashIns.add(CashData(
-            cashType: CashType.cashIn,
-            amount: amount,
-            date: date,
-            tCode: 1,
-            tImage: "assets/add_money.jpg"));
+        if(amount.toString().length <= 5){
+          totalReceived += amount;
+          final date = FetchDoubleFromString.retrieveDateData(item.body!);
+          cashIns.add(CashData(
+              cashType: CashType.cashIn,
+              amount: amount,
+              date: date,
+              tCode: 1,
+              tImage: "assets/add_money.jpg"));
+        }
         FetchDoubleFromString.retrieveAmountData(item.body!);
       }
     }

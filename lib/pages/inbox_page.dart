@@ -77,37 +77,6 @@ class _InboxPageState extends State<InboxPage> {
                 }).toList();
               },
             ),
-            // DropdownButton<String>(
-            //   value: cashProvider.selectedService,
-            //   icon: const Icon(Icons.arrow_downward,color: Colors.white,),
-            //   elevation: 0,
-            //   style: const TextStyle(color: Colors.black),
-            //   borderRadius: BorderRadius.circular(12.0),
-            //   underline: Container(
-            //     height: 2,
-            //     color: Colors.transparent,
-            //   ),
-            //   onChanged: (String? value) async {
-            //     await cashProvider.onServiceChanged(val: value ?? services.first);
-            //   },
-            //   items: services.map<DropdownMenuItem<String>>((String value) {
-            //     return DropdownMenuItem<String>(
-            //       value: value,
-            //       child: ColoredBox(
-            //           color: Colors.white,
-            //           child: Padding(
-            //             padding: const EdgeInsets.all(8.0),
-            //             child: Text(value.toLowerCase(), style: AppTheme.tTrxText.copyWith(color: Colors.black),),
-            //           )),
-            //     );
-            //   }).toList(),
-            // ),
-            // IconButton(
-            //   onPressed: () async {
-            //     await cashProvider.onRefresh();
-            //   },
-            //   icon: const Icon(Icons.refresh),
-            // ),
           ],
         ),
         body: Column(
