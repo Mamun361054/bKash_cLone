@@ -1,3 +1,4 @@
+import 'package:bkash/pages/inbox_page.dart';
 import 'package:bkash/pages/wrapper_screen.dart';
 import 'package:bkash/providers/sms_receiver.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,10 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.deepPurple,
         ),
         home: const WrapperScreen(),
+        // home: const InboxPage(
+        //   title: 'Summary',
+        // ),
+        builder: EasyLoading.init(),
       ),
     );
   }

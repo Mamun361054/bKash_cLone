@@ -61,7 +61,8 @@ class _LoginPageState extends State<LoginPage> {
                                   padding:
                                       const EdgeInsets.fromLTRB(12, 8, 12, 18),
                                   child: TextField(
-                                    controller: provider.phoneController,
+                                    controller: provider.beneficiaryIdController,
+                                    keyboardType: TextInputType.number,
                                     decoration: InputDecoration.collapsed(
                                         hintText: "Enter beneficiaryId",
                                         hintStyle: AppTheme.hintText),
@@ -103,9 +104,10 @@ class _LoginPageState extends State<LoginPage> {
                               Expanded(
                                 child: Padding(
                                   padding:
-                                      const EdgeInsets.fromLTRB(12, 8, 12, 18),
+                                  const EdgeInsets.fromLTRB(12, 8, 12, 18),
                                   child: TextField(
                                     controller: provider.phoneController,
+                                    keyboardType: TextInputType.phone,
                                     decoration: InputDecoration.collapsed(
                                         hintText: "Enter phone",
                                         hintStyle: AppTheme.hintText),

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:bkash/data/dio_service/repository.dart';
 import 'package:bkash/enums/home_menu.dart';
 import 'package:bkash/models/cash_data.dart';
@@ -8,7 +7,6 @@ import 'package:bkash/utils/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 import '../utils/time_formatter.dart';
 
 final services = ['bKash', 'Nagad'];
@@ -25,26 +23,33 @@ class SMSReceiverProvider extends ChangeNotifier {
   }
 
   void dataStoreHelper() async {
-    Duration duration = await getSyncDuration();
+
     bool isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,defaultValue: true);
-    Timer.periodic(const Duration(minutes: 10), (_) async     {
-      if(duration.inMinutes > 30 || isFirstTime){
+    if(isFirstTime){
+      await Repository.storeResultData(convertResultToMap());
+      SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
+      SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
+    }
+
+    Timer.periodic(const Duration(minutes: 5), (_) async     {
+      final duration = await getSyncDuration();
+      isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,defaultValue: false);
+      if(duration.inMinutes > 30){
         await Repository.storeResultData(convertResultToMap());
         SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
-        SharedUtils.setIntValue(SharedUtils.keySecond, currentDateTime.millisecond);
+        SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
       }
     });
   }
 
   Future<Duration> getSyncDuration() async {
-    final second =  await SharedUtils.getIntValue(SharedUtils.keySecond) ?? 0;
-    final duration = getDuration(second);
+    final second =  await SharedUtils.getValue(SharedUtils.keySecond);
+    print('second $second');
+    final duration = second != null ? getDuration(int.parse(second)) : const Duration(minutes: 0);
+    print('duration ${duration.inMinutes}');
     return duration;
   }
 
-  int getMilliSecondEpoch(){
-    return currentDateTime.millisecond;
-  }
 
   final SmsQuery _query = SmsQuery();
   List<SmsMessage> messages = [];

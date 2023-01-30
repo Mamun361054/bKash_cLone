@@ -57,4 +57,9 @@ class SharedUtils{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(key);
   }
+
+  static Future<bool> clearCache() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.clear();
+  }
 }

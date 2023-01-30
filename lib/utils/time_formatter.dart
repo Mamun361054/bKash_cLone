@@ -97,7 +97,7 @@ String timeUntil(DateTime date) {
 }
 
 DateTime getDateTimeFromTimestamp(int timestamp) {
-  return DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
+  return DateTime.fromMillisecondsSinceEpoch(timestamp);
 }
 
 String getTimeFromTimestamp(int timestamp) {
@@ -109,10 +109,12 @@ String getTimeFromTimestamp(int timestamp) {
 }
 
 ///return duration from current date time(by difference)
-///we get how many days hours minutes secondsx spanned from now
+///we get how many days hours minutes seconds spanned from now
 Duration getDuration(int timestamp) {
   var now = DateTime.now();
+  print('now ${now.toString()}');
   var date = getDateTimeFromTimestamp(timestamp);
+  print('date ${date.toString()}');
   return now.difference(date);
 }
 

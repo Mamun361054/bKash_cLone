@@ -1,3 +1,5 @@
+import 'package:bkash/pages/login_screen.dart';
+import 'package:bkash/utils/shared_preferences.dart';
 import 'package:bkash/widgets/cash_in_widget.dart';
 import 'package:bkash/widgets/cashout_widget.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,11 @@ class _InboxPageState extends State<InboxPage> {
         case 'Refresh':
           await cashProvider.onRefresh();
           break;
+        case 'Logout':
+          SharedUtils.clearCache().then((_){
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+          });
+          break;
       }
     }
     ///store data from device to server if last stored
@@ -62,7 +69,7 @@ class _InboxPageState extends State<InboxPage> {
             PopupMenuButton<String>(
               onSelected: _handleMenuItem,
               itemBuilder: (_) {
-                return ['bKash', 'Nagad', 'Refresh'].map((e) {
+                return ['bKash', 'Nagad', 'Refresh','Logout'].map((e) {
                   return PopupMenuItem<String>(
                     value: e,
                     child: Text(e),
