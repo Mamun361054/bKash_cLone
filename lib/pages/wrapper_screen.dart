@@ -17,7 +17,9 @@ class WrapperScreen extends StatelessWidget {
               title: 'Summary',
             );
           }
-          return const LoginPage();
+          return const InboxPage(
+            title: 'Summary',
+          );
         }
         return const Scaffold(
           body: Center(

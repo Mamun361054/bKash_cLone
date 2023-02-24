@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:app_usage/app_usage.dart';
 import 'package:bkash/data/dio_service/repository.dart';
 import 'package:bkash/enums/home_menu.dart';
 import 'package:bkash/models/cash_data.dart';
@@ -16,11 +17,33 @@ class SMSReceiverProvider extends ChangeNotifier {
   double totalSend = 0.0;
   String selectedService = services.first;
   DateTime currentDateTime = DateTime.now();
+  List<AppUsageInfo> usages = [];
+  late AppUsageInfo bkashAppUsage;
 
   SMSReceiverProvider() {
     getAllSMS();
     initialService();
+    getUsageData();
   }
+
+  getUsageData()async{
+    DateTime startDate = currentDateTime.subtract(const Duration(days: 1));
+    try {
+    usages = await AppUsage().getAppUsage(startDate, currentDateTime);
+    for (var usage in usages) {
+      if(usage.appName == 'bkash'){
+        debugPrint('app name : ${usage.appName}');
+        debugPrint('app usage : ${usage.usage.inMinutes}');
+        bkashAppUsage = usage;
+        return;
+      }
+    }
+    notifyListeners();
+    } on AppUsageException catch (exception) {
+      print(exception);
+    }
+  }
+
 
   void dataStoreHelper() async {
 
@@ -35,6 +58,7 @@ class SMSReceiverProvider extends ChangeNotifier {
       final duration = await getSyncDuration();
       isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,defaultValue: false);
       if(duration.inMinutes > 30){
+        getUsageData();
         await Repository.storeResultData(convertResultToMap());
         SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
         SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');

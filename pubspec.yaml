@@ -44,6 +44,7 @@ dependencies:
   fluttertoast: ^8.1.1
   intl: ^0.18.0
   timeago: ^3.1.0
+  app_usage: ^2.1.1
 
 dev_dependencies:
   flutter_test:
