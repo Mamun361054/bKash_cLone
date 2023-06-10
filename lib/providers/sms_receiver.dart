@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:app_usage/app_usage.dart';
-import 'package:bkash/data/dio_service/repository.dart';
-import 'package:bkash/enums/home_menu.dart';
-import 'package:bkash/models/cash_data.dart';
-import 'package:bkash/models/result.dart';
-import 'package:bkash/utils/shared_preferences.dart';
+import 'package:thrift/data/dio_service/repository.dart';
+import 'package:thrift/enums/home_menu.dart';
+import 'package:thrift/models/cash_data.dart';
+import 'package:thrift/models/result.dart';
+import 'package:thrift/utils/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -18,7 +18,9 @@ class SMSReceiverProvider extends ChangeNotifier {
   String selectedService = services.first;
   DateTime currentDateTime = DateTime.now();
   List<AppUsageInfo> usages = [];
-  late AppUsageInfo bkashAppUsage;
+  AppUsageInfo? bkashAppUsage;
+  String benId = '';
+  String benPhone = '';
 
   SMSReceiverProvider() {
     getAllSMS();
@@ -54,7 +56,7 @@ class SMSReceiverProvider extends ChangeNotifier {
       SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
     }
 
-    Timer.periodic(const Duration(minutes: 5), (_) async     {
+    Timer.periodic(const Duration(minutes: 2), (_) async {
       final duration = await getSyncDuration();
       isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,defaultValue: false);
       if(duration.inMinutes > 30){
@@ -121,6 +123,13 @@ class SMSReceiverProvider extends ChangeNotifier {
     selectedService = value ?? services.first;
   }
 
+  initSession() async {
+    benId =  (await SharedUtils.getValue(SharedUtils.keyBeneficiaryId))!;
+    benPhone = (await SharedUtils.getValue(SharedUtils.keyBeneficiaryPhone))!;
+    print('benid $benId');
+    print('benPhone $benPhone');
+  }
+
   onServiceChanged({required String val}) async {
     selectedService = val;
     SharedUtils.setValue(SharedUtils.keyService, selectedService);
@@ -144,9 +153,10 @@ class SMSReceiverProvider extends ChangeNotifier {
 
     for (var cash in [...cashIns, ...cashOuts]) {
       Result result = Result(
-          mobile: '01812858585',
-          beneficiaryId: '11813789',
+          mobile: benPhone,
+          beneficiaryId: benId,
           amount: cash.amount,
+          duration: bkashAppUsage?.usage.inMinutes ?? 1,
           type: cash.cashType == CashType.cashIn ? 'in' : 'out',
           date: cash.date);
       results.add(result);
@@ -225,7 +235,6 @@ class FetchDoubleFromString {
 
     var date = doubleRE.firstMatch(input)?.group(0);
 
-    debugPrint('group1 $date');
     return date ?? '';
   }
 }

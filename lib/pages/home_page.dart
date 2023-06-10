@@ -1,17 +1,12 @@
 import 'package:barcode_scan2/gen/protos/protos.pb.dart';
-import 'package:barcode_scan2/gen/protos/protos.pbenum.dart';
 import 'package:barcode_scan2/model/android_options.dart';
 import 'package:barcode_scan2/model/scan_options.dart';
 import 'package:barcode_scan2/platform_wrapper.dart';
-import 'package:bkash/pages/inbox_page.dart';
-import 'package:bkash/widgets/drawer_widget.dart';
-import 'package:bkash/widgets/home_body_widget.dart';
-import 'package:bkash/widgets/cash_in_widget.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:thrift/pages/inbox_page.dart';
+import 'package:thrift/widgets/drawer_widget.dart';
+import 'package:thrift/widgets/home_body_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../widgets/appbar_widget.dart';
 import '../widgets/bottom_bar_widget.dart';
 
 class MyHomePage extends StatefulWidget {

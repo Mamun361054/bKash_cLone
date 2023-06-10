@@ -1,5 +1,5 @@
-import 'package:bkash/styles/AppText.dart';
-import 'package:bkash/widgets/send_money_widget.dart';
+import 'package:thrift/styles/AppText.dart';
+import 'package:thrift/widgets/send_money_widget.dart';
 import 'package:flutter/cupertino.dart';
 
 enum HomeMenu {

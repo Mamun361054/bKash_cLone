@@ -1,7 +1,7 @@
-import 'package:bkash/enums/home_menu.dart';
-import 'package:bkash/models/contact.dart';
-import 'package:bkash/pages/amount_page.dart';
-import 'package:bkash/styles/AppTheme.dart';
+import 'package:thrift/enums/home_menu.dart';
+import 'package:thrift/models/contact.dart';
+import 'package:thrift/pages/amount_page.dart';
+import 'package:thrift/styles/AppTheme.dart';
 import 'package:flutter/material.dart';
 
 class ContactsWidget extends StatelessWidget {

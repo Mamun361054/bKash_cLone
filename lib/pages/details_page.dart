@@ -1,5 +1,4 @@
-import 'package:bkash/enums/home_menu.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:thrift/enums/home_menu.dart';
 import 'package:flutter/material.dart';
 
 import '../styles/AppTheme.dart';

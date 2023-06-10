@@ -4,12 +4,14 @@ class Result {
   final String type;
   final double amount;
   final String date;
+  final int duration;
 
   Result(
       {required this.mobile,
       required this.beneficiaryId,
       required this.amount,
       required this.type,
+      required this.duration,
       required this.date});
 
   Map<String, dynamic> get toMap => {
@@ -17,6 +19,7 @@ class Result {
         "beneficiaryMobile": mobile,
         "type": type,
         "amount": amount,
-        "date": date
+        "date": date,
+        "duration": duration
       };
 }

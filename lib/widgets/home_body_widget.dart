@@ -1,10 +1,9 @@
-import 'package:bkash/enums/home_menu.dart';
-import 'package:bkash/styles/AppTheme.dart';
-import 'package:bkash/widgets/appbar_widget.dart';
-import 'package:bkash/widgets/home_menu_widget.dart';
-import 'package:bkash/widgets/offer_widget.dart';
+import 'package:thrift/enums/home_menu.dart';
+import 'package:thrift/styles/AppTheme.dart';
+import 'package:thrift/widgets/appbar_widget.dart';
+import 'package:thrift/widgets/home_menu_widget.dart';
+import 'package:thrift/widgets/offer_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../pages/details_page.dart';

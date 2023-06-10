@@ -1,5 +1,5 @@
-import 'package:bkash/pages/login_screen.dart';
-import 'package:bkash/utils/shared_preferences.dart';
+import 'package:thrift/pages/login_screen.dart';
+import 'package:thrift/utils/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'inbox_page.dart';
 
@@ -17,9 +17,7 @@ class WrapperScreen extends StatelessWidget {
               title: 'Summary',
             );
           }
-          return const InboxPage(
-            title: 'Summary',
-          );
+          return const LoginPage();
         }
         return const Scaffold(
           body: Center(

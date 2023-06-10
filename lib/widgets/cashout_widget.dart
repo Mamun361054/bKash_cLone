@@ -1,8 +1,5 @@
-import 'package:bkash/models/notifications.dart';
-import 'package:bkash/models/transaction.dart';
-import 'package:bkash/styles/AppTheme.dart';
-import 'package:bkash/utils/TextUtils.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:thrift/styles/AppTheme.dart';
+import 'package:thrift/utils/TextUtils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

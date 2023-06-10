@@ -1,6 +1,5 @@
-import 'package:bkash/pages/inbox_page.dart';
-import 'package:bkash/pages/wrapper_screen.dart';
-import 'package:bkash/providers/sms_receiver.dart';
+import 'package:thrift/pages/wrapper_screen.dart';
+import 'package:thrift/providers/sms_receiver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';

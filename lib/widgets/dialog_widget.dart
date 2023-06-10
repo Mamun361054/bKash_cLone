@@ -1,6 +1,5 @@
-import 'package:bkash/styles/AppTheme.dart';
-import 'package:bkash/widgets/confirmation_widget.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:thrift/styles/AppTheme.dart';
+import 'package:thrift/widgets/confirmation_widget.dart';
 import 'package:flutter/material.dart';
 
 import 'animated_button.dart';

@@ -1,8 +1,6 @@
 import 'dart:async';
-
-import 'package:bkash/pages/home_page.dart';
-import 'package:bkash/styles/AppTheme.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:thrift/pages/home_page.dart';
+import 'package:thrift/styles/AppTheme.dart';
 import 'package:flutter/material.dart';
 
 import 'animated_button.dart';

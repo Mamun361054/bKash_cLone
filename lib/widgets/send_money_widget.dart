@@ -1,7 +1,5 @@
-import 'package:bkash/models/contact.dart';
-import 'package:bkash/widgets/contacts_widget.dart';
-import 'package:bkash/widgets/send_money_widget.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:thrift/models/contact.dart';
+import 'package:thrift/widgets/contacts_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../styles/AppTheme.dart';

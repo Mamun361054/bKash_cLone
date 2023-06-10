@@ -1,4 +1,4 @@
-import 'package:bkash/styles/AppTheme.dart';
+import 'package:thrift/styles/AppTheme.dart';
 import 'package:flutter/material.dart';
 
 TextStyle getAmtStyle(int code) {

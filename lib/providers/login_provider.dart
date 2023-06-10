@@ -1,5 +1,5 @@
-import 'package:bkash/data/dio_service/repository.dart';
-import 'package:bkash/utils/shared_preferences.dart';
+import 'package:thrift/data/dio_service/repository.dart';
+import 'package:thrift/utils/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../data/response_model/body_login.dart';

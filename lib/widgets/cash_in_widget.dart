@@ -1,5 +1,5 @@
-import 'package:bkash/enums/home_menu.dart';
-import 'package:bkash/styles/AppTheme.dart';
+import 'package:thrift/enums/home_menu.dart';
+import 'package:thrift/styles/AppTheme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/sms_receiver.dart';

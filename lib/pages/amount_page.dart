@@ -1,7 +1,6 @@
-import 'package:bkash/enums/home_menu.dart';
-import 'package:bkash/pages/pin_page.dart';
-import 'package:bkash/widgets/purpose_widget.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:thrift/enums/home_menu.dart';
+import 'package:thrift/pages/pin_page.dart';
+import 'package:thrift/widgets/purpose_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../styles/AppTheme.dart';

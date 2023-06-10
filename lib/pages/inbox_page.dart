@@ -1,7 +1,7 @@
-import 'package:bkash/pages/login_screen.dart';
-import 'package:bkash/utils/shared_preferences.dart';
-import 'package:bkash/widgets/cash_in_widget.dart';
-import 'package:bkash/widgets/cashout_widget.dart';
+import 'package:thrift/pages/login_screen.dart';
+import 'package:thrift/utils/shared_preferences.dart';
+import 'package:thrift/widgets/cash_in_widget.dart';
+import 'package:thrift/widgets/cashout_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/sms_receiver.dart';
@@ -21,6 +21,8 @@ class _InboxPageState extends State<InboxPage> {
   Widget build(BuildContext context) {
 
     final cashProvider = Provider.of<SMSReceiverProvider>(context);
+
+    cashProvider.initSession();
 
     void _handleMenuItem(String value) async {
       switch (value) {
