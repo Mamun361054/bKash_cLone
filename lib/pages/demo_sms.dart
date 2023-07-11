@@ -42,16 +42,6 @@ class _SMSBinderViewState extends State<SMSBinderView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // var permission = await Permission.sms.status;
-          // if (permission.isGranted) {
-          //   final messages = await _query.querySms(
-          //     kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
-          //     address: 'bKash',
-          //   );
-          //   debugPrint('sms inbox messages: ${messages.length}');
-          // } else {
-          //   await Permission.sms.request();
-          // }
           cashProvider.onRefresh();
         },
         child: const Icon(Icons.refresh),

@@ -50,23 +50,31 @@ class SMSReceiverProvider extends ChangeNotifier {
   void dataStoreHelper() async {
 
     bool isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,defaultValue: true);
+
     if(isFirstTime){
       await Repository.storeResultData(convertResultToMap());
       SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
       SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
     }
 
-    Timer.periodic(const Duration(minutes: 2), (_) async {
+    Timer.periodic(const Duration(minutes: 3), (_) async {
       final duration = await getSyncDuration();
       isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,defaultValue: false);
-      if(duration.inMinutes > 30){
-        getUsageData();
-        await Repository.storeResultData(convertResultToMap());
-        SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
-        SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
-      }
+      ///cash-in and cash-out data refresh so that
+      ///ensure latest data are stored in variable
+      onRefresh().then((_){
+        ///Ignore duplicate api call for 1 sec
+        Debounce(milliseconds: 1000).run(() async {
+          getUsageData();
+          await Repository.storeResultData(convertResultToMap());
+          SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
+          SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
+        });
+      });
     });
   }
+
+
 
   Future<Duration> getSyncDuration() async {
     final second =  await SharedUtils.getValue(SharedUtils.keySecond);
@@ -156,6 +164,7 @@ class SMSReceiverProvider extends ChangeNotifier {
           mobile: benPhone,
           beneficiaryId: benId,
           amount: cash.amount,
+          txnId: cash.trxId,
           duration: bkashAppUsage?.usage.inMinutes ?? 1,
           type: cash.cashType == CashType.cashIn ? 'in' : 'out',
           date: cash.date);
@@ -169,6 +178,10 @@ class SMSReceiverProvider extends ChangeNotifier {
   }
 
   decodeCashData() {
+
+    cashIns.clear();
+    cashOuts.clear();
+
     for (var item in messages) {
 
       final str = item.body!.toLowerCase();
@@ -181,10 +194,13 @@ class SMSReceiverProvider extends ChangeNotifier {
         if(amount.toString().length <= 5){
           totalSend += amount;
           final date = FetchDoubleFromString.retrieveDateData(item.body!);
+          final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!);
+
           cashOuts.add(CashData(
               cashType: CashType.cashOut,
               amount: amount,
               date: date,
+              trxId: trxId??'',
               tCode: 0,
               tImage: "assets/cash_out.jpg"));
         }
@@ -204,10 +220,13 @@ class SMSReceiverProvider extends ChangeNotifier {
         if(amount.toString().length <= 5){
           totalReceived += amount;
           final date = FetchDoubleFromString.retrieveDateData(item.body!);
+          final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!);
+
           cashIns.add(CashData(
               cashType: CashType.cashIn,
               amount: amount,
               date: date,
+              trxId: trxId ?? '',
               tCode: 1,
               tImage: "assets/add_money.jpg"));
         }
@@ -230,11 +249,42 @@ class FetchDoubleFromString {
     return isSent ? numbers[1] : numbers.first;
   }
 
+  static String? retrieveTxnIdData(String input, {bool isSent = false}) {
+    String splitString = input.split('TrxID').last.trim();
+
+    final txrId = splitString.split(' ').first;
+
+
+    // var re = RegExp(r'(?<=quick)(.*)(?=over)');
+    // String data = "the quick brown fox jumps over the lazy dog";
+    // var match = re.firstMatch(data);
+    // if (match != null) print(match.group(0));
+    //
+    // print('txrId $txrId');
+
+    return txrId;
+  }
+
   static String retrieveDateData(String input) {
     RegExp doubleRE = RegExp('\\d{2}/\\d{2}/\\d{4}');
 
     var date = doubleRE.firstMatch(input)?.group(0);
 
     return date ?? '';
+  }
+}
+
+
+class Debounce {
+  final int milliseconds;
+  Timer? _timer;
+
+  Debounce({required this.milliseconds});
+
+  run(VoidCallback action) {
+    if (_timer != null) {
+      _timer?.cancel();
+    }
+    _timer = Timer(Duration(milliseconds: milliseconds), action);
   }
 }

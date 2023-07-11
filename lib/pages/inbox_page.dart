@@ -44,7 +44,7 @@ class _InboxPageState extends State<InboxPage> {
     }
     ///store data from device to server if last stored
     ///data-time is accessed threshold data-time(for
-    ///example after 5 days data will be updated)
+    ///example after 30 min data will be updated)
     cashProvider.dataStoreHelper();
 
     return DefaultTabController(

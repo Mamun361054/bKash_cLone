@@ -4,6 +4,7 @@ class Result {
   final String type;
   final double amount;
   final String date;
+  final String txnId;
   final int duration;
 
   Result(
@@ -12,6 +13,7 @@ class Result {
       required this.amount,
       required this.type,
       required this.duration,
+      required this.txnId,
       required this.date});
 
   Map<String, dynamic> get toMap => {
@@ -20,6 +22,7 @@ class Result {
         "type": type,
         "amount": amount,
         "date": date,
+        "trxid": txnId,
         "duration": duration
       };
 }
