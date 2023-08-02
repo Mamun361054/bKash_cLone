@@ -4,6 +4,7 @@ import 'package:thrift/data/dio_service/repository.dart';
 import 'package:thrift/enums/home_menu.dart';
 import 'package:thrift/models/cash_data.dart';
 import 'package:thrift/models/result.dart';
+import 'package:thrift/utils/app_consts.dart';
 import 'package:thrift/utils/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
@@ -19,6 +20,7 @@ class SMSReceiverProvider extends ChangeNotifier {
   DateTime currentDateTime = DateTime.now();
   List<AppUsageInfo> usages = [];
   AppUsageInfo? bkashAppUsage;
+  AppUsageInfo? currentAppUsage;
   String benId = '';
   String benPhone = '';
 
@@ -28,15 +30,21 @@ class SMSReceiverProvider extends ChangeNotifier {
     getUsageData();
   }
 
-  getUsageData()async{
+  getUsageData() async{
     DateTime startDate = currentDateTime.subtract(const Duration(days: 1));
     try {
     usages = await AppUsage().getAppUsage(startDate, currentDateTime);
     for (var usage in usages) {
+      debugPrint('app name : ${usage.appName}');
       if(usage.appName == 'bkash'){
         debugPrint('app name : ${usage.appName}');
         debugPrint('app usage : ${usage.usage.inMinutes}');
         bkashAppUsage = usage;
+      }
+      if(usage.appName == 'thrift'){
+        debugPrint('app name : ${usage.appName}');
+        debugPrint('app usage : ${usage.usage.inMinutes}');
+        currentAppUsage = usage;
         return;
       }
     }
@@ -58,13 +66,15 @@ class SMSReceiverProvider extends ChangeNotifier {
     }
 
     Timer.periodic(const Duration(minutes: 3), (_) async {
+
       final duration = await getSyncDuration();
+
       isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,defaultValue: false);
       ///cash-in and cash-out data refresh so that
       ///ensure latest data are stored in variable
       onRefresh().then((_){
-        ///Ignore duplicate api call for 1 sec
-        Debounce(milliseconds: 1000).run(() async {
+        ///Ignore duplicate api call for 5 sec
+        Debounce(milliseconds: 5000).run(() async {
           getUsageData();
           await Repository.storeResultData(convertResultToMap());
           SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
@@ -166,7 +176,9 @@ class SMSReceiverProvider extends ChangeNotifier {
           amount: cash.amount,
           txnId: cash.trxId,
           duration: bkashAppUsage?.usage.inMinutes ?? 1,
+          thriftDuration: currentAppUsage?.usage.inMinutes ?? 1,
           type: cash.cashType == CashType.cashIn ? 'in' : 'out',
+          subType: cash.subType,
           date: cash.date);
       results.add(result);
     }
@@ -188,6 +200,7 @@ class SMSReceiverProvider extends ChangeNotifier {
 
       if (str.contains('bill') ||
           str.contains('cash out') ||
+          str.contains('send') ||
           str.contains('recharge') ||
           str.contains('payment')) {
         final amount = FetchDoubleFromString.retrieveAmountData(item.body!);
@@ -198,6 +211,7 @@ class SMSReceiverProvider extends ChangeNotifier {
 
           cashOuts.add(CashData(
               cashType: CashType.cashOut,
+              subType: getSubType(str),
               amount: amount,
               date: date,
               trxId: trxId??'',
@@ -224,6 +238,7 @@ class SMSReceiverProvider extends ChangeNotifier {
 
           cashIns.add(CashData(
               cashType: CashType.cashIn,
+              subType: getSubType(str),
               amount: amount,
               date: date,
               trxId: trxId ?? '',
@@ -235,6 +250,7 @@ class SMSReceiverProvider extends ChangeNotifier {
     }
     convertCashToResult();
   }
+
 }
 
 class FetchDoubleFromString {
@@ -272,6 +288,7 @@ class FetchDoubleFromString {
 
     return date ?? '';
   }
+
 }
 
 
