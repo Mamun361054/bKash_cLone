@@ -96,19 +96,25 @@ class SMSReceiverProvider extends ChangeNotifier {
 
 
   final SmsQuery _query = SmsQuery();
-  List<SmsMessage> messages = [];
+  List<SmsMessage> bMessages = [];
+  List<SmsMessage> nMessages = [];
   List<CashData> cashIns = [];
   List<CashData> cashOuts = [];
 
   getAllSMS() async {
     var permission = await Permission.sms.status;
     if (permission.isGranted) {
-      messages = await _query.querySms(
+      bMessages = await _query.querySms(
         kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
         address: selectedService == 'Nagad' ? 'Nagad' : selectedService,
       );
 
-      debugPrint('sms inbox messages: ${messages.length}');
+      nMessages = await _query.querySms(
+        kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
+        address: 'Nagad',
+      );
+
+      debugPrint('sms inbox messages: ${bMessages.length}');
 
       ///decode SMS data to [CashData]
       decodeCashData();
@@ -119,12 +125,17 @@ class SMSReceiverProvider extends ChangeNotifier {
       Permission.sms.request().then((status) async {
         if (status.isGranted) {
           debugPrint(selectedService);
-          messages = await _query.querySms(
+          bMessages = await _query.querySms(
             kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
             address: selectedService == 'Nagad' ? 'NAGAD' : selectedService,
           );
 
-          debugPrint('sms inbox messages: ${messages.length}');
+          nMessages = await _query.querySms(
+            kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
+            address: 'Nagad',
+          );
+
+          debugPrint('sms inbox messages: ${bMessages.length}');
 
           ///decode SMS data to [CashData]
           decodeCashData();
@@ -156,7 +167,7 @@ class SMSReceiverProvider extends ChangeNotifier {
 
   Future onRefresh() async {
     debugPrint('onRefresh');
-    messages = [];
+    bMessages = [];
     cashIns = [];
     cashOuts = [];
     totalSend = 0.0;
@@ -174,6 +185,7 @@ class SMSReceiverProvider extends ChangeNotifier {
           mobile: benPhone,
           beneficiaryId: benId,
           amount: cash.amount,
+          sender: cash.sender,
           txnId: cash.trxId,
           duration: bkashAppUsage?.usage.inMinutes ?? 1,
           thriftDuration: currentAppUsage?.usage.inMinutes ?? 1,
@@ -194,7 +206,7 @@ class SMSReceiverProvider extends ChangeNotifier {
     cashIns.clear();
     cashOuts.clear();
 
-    for (var item in messages) {
+    for (var item in selectedService == 'Nagad' ? bMessages : [...bMessages,...nMessages]) {
 
       final str = item.body!.toLowerCase();
 
@@ -211,6 +223,7 @@ class SMSReceiverProvider extends ChangeNotifier {
 
           cashOuts.add(CashData(
               cashType: CashType.cashOut,
+              sender: item.sender ?? '',
               subType: getSubType(str),
               amount: amount,
               date: date,
@@ -240,6 +253,7 @@ class SMSReceiverProvider extends ChangeNotifier {
               cashType: CashType.cashIn,
               subType: getSubType(str),
               amount: amount,
+              sender: item.sender ?? '',
               date: date,
               trxId: trxId ?? '',
               tCode: 1,

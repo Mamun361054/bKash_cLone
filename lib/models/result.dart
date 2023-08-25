@@ -3,6 +3,7 @@ class Result {
   final String beneficiaryId;
   final String type;
   final String? subType;
+  final String? sender;
   final double amount;
   final String date;
   final String txnId;
@@ -16,6 +17,7 @@ class Result {
       required this.type,
       required this.duration,
       this.thriftDuration,
+      this.sender,
       required this.txnId,
       this.subType,
       required this.date});
@@ -24,6 +26,7 @@ class Result {
         "beneficiaryId": beneficiaryId,
         "beneficiaryMobile": mobile,
         "type": type,
+        "sender": sender,
         "sub_type": subType,
         "amount": amount,
         "date": date,
