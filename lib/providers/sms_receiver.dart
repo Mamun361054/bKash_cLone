@@ -105,7 +105,7 @@ class SMSReceiverProvider extends ChangeNotifier {
     if (permission.isGranted) {
       messages = await _query.querySms(
         kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
-        address: selectedService == 'Nagad' ? 'NAGAD' : selectedService,
+        address: selectedService == 'Nagad' ? 'Nagad' : selectedService,
       );
 
       debugPrint('sms inbox messages: ${messages.length}');
