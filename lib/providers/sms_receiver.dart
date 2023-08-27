@@ -21,6 +21,7 @@ class SMSReceiverProvider extends ChangeNotifier {
   List<AppUsageInfo> usages = [];
   AppUsageInfo? bkashAppUsage;
   AppUsageInfo? currentAppUsage;
+  AppUsageInfo? nagadAppUsage;
   String benId = '';
   String benPhone = '';
 
@@ -36,16 +37,24 @@ class SMSReceiverProvider extends ChangeNotifier {
     usages = await AppUsage().getAppUsage(startDate, currentDateTime);
     for (var usage in usages) {
       debugPrint('app name : ${usage.appName}');
-      if(usage.appName == 'bkash'){
+
+      if(usage.packageName == 'com.bKash.customerapp'){
+        debugPrint('packageName : ${usage.packageName}');
         debugPrint('app name : ${usage.appName}');
         debugPrint('app usage : ${usage.usage.inMinutes}');
         bkashAppUsage = usage;
       }
-      if(usage.appName == 'thrift'){
+      if(usage.packageName == 'com.momoda.thrift'){
+        debugPrint('packageName : ${usage.packageName}');
         debugPrint('app name : ${usage.appName}');
         debugPrint('app usage : ${usage.usage.inMinutes}');
         currentAppUsage = usage;
-        return;
+      }
+      if(usage.packageName == 'com.konasl.nagad'){
+        debugPrint('packageName : ${usage.packageName}');
+        debugPrint('app name : ${usage.appName}');
+        debugPrint('app usage : ${usage.usage.inMinutes}');
+        nagadAppUsage = usage;
       }
     }
     notifyListeners();
@@ -106,12 +115,12 @@ class SMSReceiverProvider extends ChangeNotifier {
     if (permission.isGranted) {
       bMessages = await _query.querySms(
         kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
-        address: selectedService == 'Nagad' ? 'Nagad' : selectedService,
+        address: selectedService == 'Nagad' ? 'NAGAD' : selectedService,
       );
 
       nMessages = await _query.querySms(
         kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
-        address: 'Nagad',
+        address: 'NAGAD',
       );
 
       debugPrint('sms inbox messages: ${bMessages.length}');
@@ -183,12 +192,14 @@ class SMSReceiverProvider extends ChangeNotifier {
     for (var cash in [...cashIns, ...cashOuts]) {
       Result result = Result(
           mobile: benPhone,
+          rawData: cash.raw,
           beneficiaryId: benId,
           amount: cash.amount,
           sender: cash.sender,
           txnId: cash.trxId,
           duration: bkashAppUsage?.usage.inMinutes ?? 1,
           thriftDuration: currentAppUsage?.usage.inMinutes ?? 1,
+          nagadDuration: nagadAppUsage?.usage.inMinutes ?? 1,
           type: cash.cashType == CashType.cashIn ? 'in' : 'out',
           subType: cash.subType,
           date: cash.date);
@@ -208,7 +219,9 @@ class SMSReceiverProvider extends ChangeNotifier {
 
     for (var item in selectedService == 'Nagad' ? bMessages : [...bMessages,...nMessages]) {
 
-      final str = item.body!.toLowerCase();
+      ///we have to make string lowercase for checking data
+      ///remove [sender, receiver] strings for better data
+      final str = item.body!.toLowerCase().replaceAll('sender', '').replaceAll('receiver', '');
 
       if (str.contains('bill') ||
           str.contains('cash out') ||
@@ -223,6 +236,7 @@ class SMSReceiverProvider extends ChangeNotifier {
 
           cashOuts.add(CashData(
               cashType: CashType.cashOut,
+              raw: item.body ?? '',
               sender: item.sender ?? '',
               subType: getSubType(str),
               amount: amount,
@@ -251,6 +265,7 @@ class SMSReceiverProvider extends ChangeNotifier {
 
           cashIns.add(CashData(
               cashType: CashType.cashIn,
+              raw: item.body ?? '',
               subType: getSubType(str),
               amount: amount,
               sender: item.sender ?? '',

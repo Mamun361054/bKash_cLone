@@ -6,17 +6,21 @@ class Result {
   final String? sender;
   final double amount;
   final String date;
+  final String rawData;
   final String txnId;
   final int duration;
   final int? thriftDuration;
+  final int? nagadDuration;
 
   Result(
       {required this.mobile,
       required this.beneficiaryId,
       required this.amount,
       required this.type,
+      required this.rawData,
       required this.duration,
       this.thriftDuration,
+      this.nagadDuration,
       this.sender,
       required this.txnId,
       this.subType,
@@ -32,6 +36,8 @@ class Result {
         "date": date,
         "trxid": txnId,
         "duration_bkash": duration,
-        "duration": thriftDuration
+        "duration": thriftDuration,
+        "raw_sms": rawData,
+        "duration_nagad": nagadDuration
       };
 }
