@@ -216,6 +216,8 @@ class SMSReceiverProvider extends ChangeNotifier {
 
     cashIns.clear();
     cashOuts.clear();
+    totalReceived = 0;
+    totalSend = 0;
 
     for (var item in selectedService == 'Nagad' ? bMessages : [...bMessages,...nMessages]) {
 
@@ -232,7 +234,7 @@ class SMSReceiverProvider extends ChangeNotifier {
         if(amount.toString().length <= 5){
           totalSend += amount;
           final date = FetchDoubleFromString.retrieveDateData(item.body!);
-          final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!);
+          final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!,selectedService);
 
           cashOuts.add(CashData(
               cashType: CashType.cashOut,
@@ -261,7 +263,7 @@ class SMSReceiverProvider extends ChangeNotifier {
         if(amount.toString().length <= 5){
           totalReceived += amount;
           final date = FetchDoubleFromString.retrieveDateData(item.body!);
-          final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!);
+          final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!,selectedService);
 
           cashIns.add(CashData(
               cashType: CashType.cashIn,
@@ -291,11 +293,12 @@ class FetchDoubleFromString {
         .map((m) => double.parse(m[0].toString()))
         .toList();
 
-    return isSent ? numbers[1] : numbers.first;
+    return isSent ? numbers[1] : numbers.isNotEmpty ? numbers.first : 0.0;
   }
 
-  static String? retrieveTxnIdData(String input, {bool isSent = false}) {
-    String splitString = input.split('TrxID').last.trim();
+  static String? retrieveTxnIdData(String input,String operator, {bool isSent = false}) {
+
+    String splitString = operator == "Nagad" ? input.split('TxnID').last.trim() : input.split('TrxID').last.trim();
 
     final txrId = splitString.split(' ').first;
 
