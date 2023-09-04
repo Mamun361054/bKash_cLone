@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:app_usage/app_usage.dart';
+import 'package:string_validator/string_validator.dart';
 import 'package:thrift/data/dio_service/repository.dart';
 import 'package:thrift/enums/home_menu.dart';
 import 'package:thrift/models/cash_data.dart';
@@ -31,78 +32,84 @@ class SMSReceiverProvider extends ChangeNotifier {
     getUsageData();
   }
 
-  getUsageData() async{
+  getUsageData() async {
     DateTime startDate = currentDateTime.subtract(const Duration(days: 1));
     try {
-    usages = await AppUsage().getAppUsage(startDate, currentDateTime);
-    for (var usage in usages) {
-      debugPrint('app name : ${usage.appName}');
+      usages = await AppUsage().getAppUsage(startDate, currentDateTime);
+      for (var usage in usages) {
+        debugPrint('app name : ${usage.appName}');
 
-      if(usage.packageName == 'com.bKash.customerapp'){
-        debugPrint('packageName : ${usage.packageName}');
-        debugPrint('app name : ${usage.appName}');
-        debugPrint('app usage : ${usage.usage.inMinutes}');
-        bkashAppUsage = usage;
+        if (usage.packageName == 'com.bKash.customerapp') {
+          debugPrint('packageName : ${usage.packageName}');
+          debugPrint('app name : ${usage.appName}');
+          debugPrint('app usage : ${usage.usage.inMinutes}');
+          bkashAppUsage = usage;
+        }
+        if (usage.packageName == 'com.momoda.thrift') {
+          debugPrint('packageName : ${usage.packageName}');
+          debugPrint('app name : ${usage.appName}');
+          debugPrint('app usage : ${usage.usage.inMinutes}');
+          currentAppUsage = usage;
+        }
+        if (usage.packageName == 'com.konasl.nagad') {
+          debugPrint('packageName : ${usage.packageName}');
+          debugPrint('app name : ${usage.appName}');
+          debugPrint('app usage : ${usage.usage.inMinutes}');
+          nagadAppUsage = usage;
+        }
       }
-      if(usage.packageName == 'com.momoda.thrift'){
-        debugPrint('packageName : ${usage.packageName}');
-        debugPrint('app name : ${usage.appName}');
-        debugPrint('app usage : ${usage.usage.inMinutes}');
-        currentAppUsage = usage;
-      }
-      if(usage.packageName == 'com.konasl.nagad'){
-        debugPrint('packageName : ${usage.packageName}');
-        debugPrint('app name : ${usage.appName}');
-        debugPrint('app usage : ${usage.usage.inMinutes}');
-        nagadAppUsage = usage;
-      }
-    }
-    notifyListeners();
+      notifyListeners();
     } on AppUsageException catch (exception) {
       print(exception);
     }
   }
 
-
   void dataStoreHelper() async {
+    bool isFirstTime = await SharedUtils.getBoolValue(
+        SharedUtils.keyIsFirstTime,
+        defaultValue: true);
 
-    bool isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,defaultValue: true);
-
-    if(isFirstTime){
-      await Repository.storeResultData(convertResultToMap());
-      SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
-      SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
+    if (isFirstTime) {
+      if (convertResultToMap().isNotEmpty) {
+        await Repository.storeResultData(convertResultToMap());
+        SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
+        SharedUtils.setValue(
+            SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
+      }
     }
 
     Timer.periodic(const Duration(minutes: 3), (_) async {
-
       final duration = await getSyncDuration();
 
-      isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,defaultValue: false);
+      isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,
+          defaultValue: false);
+
       ///cash-in and cash-out data refresh so that
       ///ensure latest data are stored in variable
-      onRefresh().then((_){
+      onRefresh().then((_) {
         ///Ignore duplicate api call for 5 sec
         Debounce(milliseconds: 5000).run(() async {
           getUsageData();
-          await Repository.storeResultData(convertResultToMap());
+          if (convertResultToMap().isNotEmpty) {
+            await Repository.storeResultData(convertResultToMap());
+          }
           SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
-          SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
+          SharedUtils.setValue(SharedUtils.keySecond,
+              '${currentDateTime.millisecondsSinceEpoch}');
         });
       });
     });
   }
 
-
-
   Future<Duration> getSyncDuration() async {
-    final second =  await SharedUtils.getValue(SharedUtils.keySecond);
+    final second = await SharedUtils.getValue(SharedUtils.keySecond);
     print('second $second');
-    final duration = second != null ? getDuration(int.parse(second)) : const Duration(minutes: 0);
+    final duration = second != null
+        ? getDuration(int.parse(second))
+        : const Duration(minutes: 0);
     print('duration ${duration.inMinutes}');
     return duration;
   }
-
 
   final SmsQuery _query = SmsQuery();
   List<SmsMessage> bMessages = [];
@@ -118,10 +125,22 @@ class SMSReceiverProvider extends ChangeNotifier {
         address: selectedService == 'Nagad' ? 'NAGAD' : selectedService,
       );
 
+      if (selectedService == 'Nagad') {
+        bMessages.addAll(await _query.querySms(
+          kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
+          address: 'Nagad',
+        ));
+      }
+
       nMessages = await _query.querySms(
         kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
         address: 'NAGAD',
       );
+
+      nMessages.addAll(await _query.querySms(
+        kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
+        address: 'Nagad',
+      ));
 
       debugPrint('sms inbox messages: ${bMessages.length}');
 
@@ -139,10 +158,22 @@ class SMSReceiverProvider extends ChangeNotifier {
             address: selectedService == 'Nagad' ? 'NAGAD' : selectedService,
           );
 
+          if (selectedService == 'Nagad') {
+            bMessages.addAll(await _query.querySms(
+              kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
+              address: 'Nagad',
+            ));
+          }
+
           nMessages = await _query.querySms(
             kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
             address: 'Nagad',
           );
+
+          nMessages.addAll(await _query.querySms(
+            kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
+            address: 'NAGAD',
+          ));
 
           debugPrint('sms inbox messages: ${bMessages.length}');
 
@@ -162,7 +193,7 @@ class SMSReceiverProvider extends ChangeNotifier {
   }
 
   initSession() async {
-    benId =  (await SharedUtils.getValue(SharedUtils.keyBeneficiaryId))!;
+    benId = (await SharedUtils.getValue(SharedUtils.keyBeneficiaryId))!;
     benPhone = (await SharedUtils.getValue(SharedUtils.keyBeneficiaryPhone))!;
     print('benid $benId');
     print('benPhone $benPhone');
@@ -186,7 +217,6 @@ class SMSReceiverProvider extends ChangeNotifier {
   }
 
   List<Result> convertCashToResult() {
-
     List<Result> results = [];
 
     for (var cash in [...cashIns, ...cashOuts]) {
@@ -208,22 +238,25 @@ class SMSReceiverProvider extends ChangeNotifier {
     return results;
   }
 
-  List<Map<String,dynamic>> convertResultToMap(){
+  List<Map<String, dynamic>> convertResultToMap() {
     return convertCashToResult().map((e) => e.toMap).toList();
   }
 
   decodeCashData() {
-
     cashIns.clear();
     cashOuts.clear();
     totalReceived = 0;
     totalSend = 0;
 
-    for (var item in selectedService == 'Nagad' ? bMessages : [...bMessages,...nMessages]) {
-
+    for (var item in selectedService == 'Nagad'
+        ? bMessages
+        : [...bMessages, ...nMessages]) {
       ///we have to make string lowercase for checking data
       ///remove [sender, receiver] strings for better data
-      final str = item.body!.toLowerCase().replaceAll('sender', '').replaceAll('receiver', '');
+      final str = item.body!
+          .toLowerCase()
+          .replaceAll('sender', '')
+          .replaceAll('receiver', '');
 
       if (str.contains('bill') ||
           str.contains('cash out') ||
@@ -231,10 +264,10 @@ class SMSReceiverProvider extends ChangeNotifier {
           str.contains('recharge') ||
           str.contains('payment')) {
         final amount = FetchDoubleFromString.retrieveAmountData(item.body!);
-        if(amount.toString().length <= 5){
+        if (amount.toString().length <= 5) {
           totalSend += amount;
           final date = FetchDoubleFromString.retrieveDateData(item.body!);
-          final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!,selectedService);
+          final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!, selectedService);
 
           cashOuts.add(CashData(
               cashType: CashType.cashOut,
@@ -243,27 +276,29 @@ class SMSReceiverProvider extends ChangeNotifier {
               subType: getSubType(str),
               amount: amount,
               date: date,
-              trxId: trxId??'',
+              trxId: isAlphanumeric(trxId) == true ?  trxId : '${trxId.hashCode}',
               tCode: 0,
               tImage: "assets/cash_out.jpg"));
         }
       } else if (str.contains('sent') ||
           str.contains('received') ||
+          str.contains('received.') ||
           str.contains('add') ||
           str.contains('cashback') ||
           str.contains('cash in')) {
-
-          double amount = 0.0;
+        double amount = 0.0;
 
         if (selectedService == "Nagad" && str.contains('sent')) {
-          amount = FetchDoubleFromString.retrieveAmountData(item.body!, isSent: true);
+          amount = FetchDoubleFromString.retrieveAmountData(item.body!,
+              isSent: true);
         } else {
           amount = FetchDoubleFromString.retrieveAmountData(item.body!);
         }
-        if(amount.toString().length <= 5){
+        if (amount.toString().length <= 5) {
           totalReceived += amount;
           final date = FetchDoubleFromString.retrieveDateData(item.body!);
-          final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!,selectedService);
+          final trxId = FetchDoubleFromString.retrieveTxnIdData(
+              item.body!, selectedService);
 
           cashIns.add(CashData(
               cashType: CashType.cashIn,
@@ -272,7 +307,7 @@ class SMSReceiverProvider extends ChangeNotifier {
               amount: amount,
               sender: item.sender ?? '',
               date: date,
-              trxId: trxId ?? '',
+              trxId: isAlphanumeric(trxId) == true ?  trxId : '${trxId.hashCode}',
               tCode: 1,
               tImage: "assets/add_money.jpg"));
         }
@@ -281,7 +316,6 @@ class SMSReceiverProvider extends ChangeNotifier {
     }
     convertCashToResult();
   }
-
 }
 
 class FetchDoubleFromString {
@@ -293,15 +327,28 @@ class FetchDoubleFromString {
         .map((m) => double.parse(m[0].toString()))
         .toList();
 
-    return isSent ? numbers[1] : numbers.isNotEmpty ? numbers.first : 0.0;
+    return isSent
+        ? numbers[1]
+        : numbers.isNotEmpty
+            ? numbers.first
+            : 0.0;
   }
 
-  static String? retrieveTxnIdData(String input,String operator, {bool isSent = false}) {
+  static String retrieveTxnIdData(String input, String operator,
+      {bool isSent = false}) {
+    String splitString = 'N/A';
 
-    String splitString = operator == "Nagad" ? input.split('TxnID').last.trim() : input.split('TrxID').last.trim();
+    input = input.replaceAll('Your', '').replaceAll('Balance:', '').replaceAll('bKash', '');
+
+    if (input.contains('TrxID')) {
+      splitString = input.split('TrxID').last.trim();
+    } else {
+      splitString = input.split('TxnID:').last.trim();
+    }
 
     final txrId = splitString.split(' ').first;
 
+    print('splitString ${splitString.split(' ').first}');
 
     // var re = RegExp(r'(?<=quick)(.*)(?=over)');
     // String data = "the quick brown fox jumps over the lazy dog";
@@ -320,9 +367,7 @@ class FetchDoubleFromString {
 
     return date ?? '';
   }
-
 }
-
 
 class Debounce {
   final int milliseconds;
