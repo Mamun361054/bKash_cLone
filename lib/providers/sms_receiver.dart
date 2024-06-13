@@ -305,3 +305,4 @@ class Debounce {
     _timer = Timer(Duration(milliseconds: milliseconds), action);
   }
 }
+
