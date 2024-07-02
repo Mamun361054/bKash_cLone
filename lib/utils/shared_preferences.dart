@@ -15,12 +15,8 @@ class SharedUtils{
 
   static Future<String?> getValue(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    try {
       var value = prefs.getString(key);
       return value;
-    } catch (error) {
-      return null;
-    }
   }
 
   static setIntValue(String key,int? value) async{
@@ -35,22 +31,15 @@ class SharedUtils{
 
   static Future<int?> getIntValue(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    try {
       var value = prefs.getInt(key);
       return value;
-    } catch (error) {
-      return null;
-    }
+
   }
 
   static Future<bool> getBoolValue(String key,{bool defaultValue = false}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    try {
       var value = prefs.getBool(key);
       return value ?? defaultValue;
-    } catch (error) {
-      return defaultValue;
-    }
   }
 
   static deleteKey(String key) async {

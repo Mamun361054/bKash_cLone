@@ -1,16 +1,18 @@
+import 'package:provider/provider.dart';
 import 'package:thrift/data/dio_service/repository.dart';
 import 'package:thrift/utils/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../data/response_model/body_login.dart';
 import '../pages/inbox_page.dart';
+import 'bkash_provider.dart';
 
 class LoginProvider extends ChangeNotifier {
   TextEditingController phoneController = TextEditingController();
   TextEditingController beneficiaryIdController = TextEditingController();
 
 
-  void loginApi(context) async {
+  void loginApi(BuildContext context) async {
     if (phoneController.text.isEmpty) {
       Fluttertoast.showToast(
           msg: "phone filed can't be empty",
@@ -38,6 +40,9 @@ class LoginProvider extends ChangeNotifier {
         SharedUtils.setValue(SharedUtils.keyBeneficiaryPhone, phoneController.text);
         SharedUtils.setValue(SharedUtils.keyBeneficiaryId, beneficiaryIdController.text);
         SharedUtils.setBoolValue(SharedUtils.keyIsLoggedIn, true);
+
+        context.read<UserProvider>().onPhoneChange(phoneController.text);
+        context.read<UserProvider>().onBeneficiaryChange(beneficiaryIdController.text);
 
         Fluttertoast.showToast(
             msg: "লগইন সফল হয়েছে",

@@ -1,14 +1,20 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:thrift/providers/bkash_provider.dart';
+import 'package:thrift/utils/global_state.dart';
 import '../../utils/app_consts.dart';
-
 
 class ApiService {
   static Dio? _dio;
 
   static Dio? getDio() {
+    final phone = globalState.get(userMap)['phoneNumber'];
+    final beneficiaryId = globalState.get(userMap)['beneficiaryId'];
+
     if (_dio == null) {
-      BaseOptions options = BaseOptions(baseUrl: AppConst.baseUrlApi);
+      BaseOptions options = BaseOptions(
+          baseUrl: AppConst.baseUrlApi,
+          headers: {'phone': phone, 'BeneficiaryId': beneficiaryId});
 
       _dio = Dio(options);
 

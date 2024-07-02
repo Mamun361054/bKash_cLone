@@ -1,5 +1,6 @@
+import 'package:provider/provider.dart';
 import 'package:thrift/pages/login_screen.dart';
-import 'package:thrift/utils/shared_preferences.dart';
+import 'package:thrift/providers/bkash_provider.dart';
 import 'package:flutter/material.dart';
 import 'inbox_page.dart';
 
@@ -8,23 +9,7 @@ class WrapperScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: SharedUtils.getBoolValue(SharedUtils.keyIsLoggedIn),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          if (snapshot.data!) {
-            return const InboxPage(
-              title: 'Summary',
-            );
-          }
-          return const LoginPage();
-        }
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-      },
-    );
+    final isLoggedIn = Provider.of<UserProvider>(context).phone != null;
+    return isLoggedIn ? const InboxPage(title: 'Summary') : const LoginPage();
   }
 }

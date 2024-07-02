@@ -1,10 +1,17 @@
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:thrift/pages/wrapper_screen.dart';
+import 'package:thrift/providers/bkash_provider.dart';
 import 'package:thrift/providers/sms_receiver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final document = await getApplicationDocumentsDirectory();
+  Hive.init(document.path);
+  await Hive.openBox('user');
   runApp(const MyApp());
   configLoading();
 }
@@ -17,8 +24,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ListenableProvider<SMSReceiverProvider>(
-            create: (_) => SMSReceiverProvider())
+        ListenableProvider<SMSReceiverProvider>(create: (_) => SMSReceiverProvider()),
+        ChangeNotifierProvider(create: (contest) => UserProvider()),
       ],
       child: MaterialApp(
         title: 'THRIFT',
