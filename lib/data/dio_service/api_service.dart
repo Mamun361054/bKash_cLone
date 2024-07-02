@@ -25,6 +25,7 @@ class ApiService {
           print('End Point : ${options.path}');
           print('Method : ${options.method}');
           print('Data : ${options.data}');
+          print('headers : ${options.headers}');
         }
 
         return handler.next(options);
