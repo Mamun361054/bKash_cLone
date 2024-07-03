@@ -67,7 +67,7 @@ class SMSReceiverProvider extends ChangeNotifier {
 
     Timer.periodic(const Duration(minutes: 3), (_) async {
 
-      final duration = await getSyncDuration();
+      // final duration = await getSyncDuration();
 
       isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,defaultValue: false);
       ///cash-in and cash-out data refresh so that

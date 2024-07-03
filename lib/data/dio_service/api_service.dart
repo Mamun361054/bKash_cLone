@@ -11,13 +11,12 @@ class ApiService {
     final phone = globalState.get(userMap)['phoneNumber'];
     final beneficiaryId = globalState.get(userMap)['beneficiaryId'];
 
+    BaseOptions options = BaseOptions(
+        baseUrl: AppConst.baseUrlApi,
+        headers: {'phone': phone, 'BeneficiaryId': beneficiaryId});
+
     if (_dio == null) {
-      BaseOptions options = BaseOptions(
-          baseUrl: AppConst.baseUrlApi,
-          headers: {'phone': phone, 'BeneficiaryId': beneficiaryId});
-
-      _dio = Dio(options);
-
+      _dio = Dio();
       _dio!.interceptors
           .add(InterceptorsWrapper(onRequest: (options, handler) async {
         if (kDebugMode) {
@@ -43,6 +42,9 @@ class ApiService {
         return handler.next(e);
       }));
     }
+
+    _dio?.options = options;
+
     return _dio;
   }
 }
