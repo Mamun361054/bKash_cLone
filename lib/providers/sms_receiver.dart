@@ -59,10 +59,12 @@ class SMSReceiverProvider extends ChangeNotifier {
 
   void dataStoreHelper() async {
 
+    await initSession();
+
     bool isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,defaultValue: true);
 
     if(isFirstTime){
-      await Repository.storeResultData(convertResultToMap());
+      await Repository.storeResultData(convertResultToMap(benId,benPhone));
       SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
       SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
     }
@@ -78,7 +80,7 @@ class SMSReceiverProvider extends ChangeNotifier {
         ///Ignore duplicate api call for 5 sec
         Debounce(milliseconds: 5000).run(() async {
           getUsageData();
-          await Repository.storeResultData(convertResultToMap());
+          await Repository.storeResultData(convertResultToMap(benId,benPhone));
           SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
           SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
         });
@@ -187,14 +189,12 @@ class SMSReceiverProvider extends ChangeNotifier {
     return results;
   }
 
-  List<Map<String,dynamic>> convertResultToMap(){
-    final phone = globalState.get(userMap)['phoneNumber'];
-    final beneficiaryId = globalState.get(userMap)['beneficiaryId'];
+  List<Map<String,dynamic>> convertResultToMap(bid,bPhn){
     final data = convertCashToResult().map((e) => e.toMap).toList();
     if(data.isNotEmpty){
       return data;
     }
-    return [Result(mobile: phone, beneficiaryId: beneficiaryId, amount: 0.0, type: 'Bkash', duration: 0, txnId: '0', date: '').toMap];
+    return [Result(mobile: bPhn, beneficiaryId: bid, amount: 0.0, type: 'Bkash', duration: 0, txnId: '0', date: '').toMap];
   }
 
   decodeCashData() {
