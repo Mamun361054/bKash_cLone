@@ -5,11 +5,13 @@ import 'package:thrift/enums/home_menu.dart';
 import 'package:thrift/models/cash_data.dart';
 import 'package:thrift/models/result.dart';
 import 'package:thrift/utils/app_consts.dart';
+import 'package:thrift/utils/global_state.dart';
 import 'package:thrift/utils/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../utils/time_formatter.dart';
+import 'bkash_provider.dart';
 
 final services = ['bKash', 'Nagad'];
 
@@ -186,7 +188,13 @@ class SMSReceiverProvider extends ChangeNotifier {
   }
 
   List<Map<String,dynamic>> convertResultToMap(){
-    return convertCashToResult().map((e) => e.toMap).toList();
+    final phone = globalState.get(userMap)['phoneNumber'];
+    final beneficiaryId = globalState.get(userMap)['beneficiaryId'];
+    final data = convertCashToResult().map((e) => e.toMap).toList();
+    if(data.isNotEmpty){
+      return data;
+    }
+    return [Result(mobile: phone, beneficiaryId: beneficiaryId, amount: 0.0, type: 'Bkash', duration: 0, txnId: '0', date: '').toMap];
   }
 
   decodeCashData() {
