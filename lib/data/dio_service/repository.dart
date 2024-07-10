@@ -48,6 +48,7 @@ class Repository {
   }
 
   ///store transaction to server
+  @pragma('vm:entry-point')
   static Future<ApiResponse<String>> storeResultData(fromData) async {
     try {
       var response = await ApiService.getDio()!.post("/transaction", data: fromData);

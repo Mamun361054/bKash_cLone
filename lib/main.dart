@@ -1,3 +1,4 @@
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:thrift/pages/wrapper_screen.dart';
@@ -12,6 +13,7 @@ void main() async {
   final document = await getApplicationDocumentsDirectory();
   Hive.init(document.path);
   await Hive.openBox('user');
+  await AndroidAlarmManager.initialize();
   runApp(const MyApp());
   configLoading();
 }
