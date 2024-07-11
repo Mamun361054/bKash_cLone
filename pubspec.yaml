@@ -48,7 +48,11 @@ dependencies:
   app_usage: ^2.1.1
   hive: ^2.2.2
   hive_flutter: ^1.1.0
-  android_alarm_manager_plus: ^4.0.3
+  android_alarm_manager_plus:
+    git:
+      url: https://github.com/jja08111/plus_plugins.git
+      path: packages/android_alarm_manager_plus
+      ref: alarm_app
 
 dev_dependencies:
   flutter_test:

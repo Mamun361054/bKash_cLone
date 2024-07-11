@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:thrift/pages/wrapper_screen.dart';
 import 'package:thrift/providers/bkash_provider.dart';
+import 'package:thrift/providers/data_polling_worker.dart';
 import 'package:thrift/providers/sms_receiver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -14,19 +15,26 @@ void main() async {
   Hive.init(document.path);
   await Hive.openBox('user');
   await AndroidAlarmManager.initialize();
-  runApp(const MyApp());
+  SMSReceiverProvider provider = SMSReceiverProvider();
+  DataPollingWorker().createPollingWorker(provider);
+  runApp(MyApp(provider: provider));
   configLoading();
+  ///schedule periodic data transmission
+  await AlarmScheduler.scheduleRepeatable();
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+
+  final SMSReceiverProvider provider;
+
+  const MyApp({Key? key,required this.provider}) : super(key: key);
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ListenableProvider<SMSReceiverProvider>(create: (_) => SMSReceiverProvider()),
+        ListenableProvider<SMSReceiverProvider>(create: (_) => provider),
         ChangeNotifierProvider(create: (contest) => UserProvider()),
       ],
       child: MaterialApp(

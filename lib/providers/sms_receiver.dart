@@ -6,13 +6,11 @@ import 'package:thrift/enums/home_menu.dart';
 import 'package:thrift/models/cash_data.dart';
 import 'package:thrift/models/result.dart';
 import 'package:thrift/utils/app_consts.dart';
-import 'package:thrift/utils/global_state.dart';
 import 'package:thrift/utils/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../utils/time_formatter.dart';
-import 'bkash_provider.dart';
 
 final services = ['bKash', 'Nagad'];
 
@@ -71,22 +69,8 @@ class SMSReceiverProvider extends ChangeNotifier {
           SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
     }
 
-    await AndroidAlarmManager.periodic(const Duration(minutes: 1), 1, () async {
-      ///cash-in and cash-out data refresh so that
-      ///ensure latest data are stored in variable
-      onRefresh().then((_) {
-        ///Ignore duplicate api call for 1 sec
-        Debounce(milliseconds: 1000).run(() async {
-          getUsageData();
-          await Repository.storeResultData(convertResultToMap(benId, benPhone));
-          SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
-          SharedUtils.setValue(SharedUtils.keySecond,
-              '${currentDateTime.millisecondsSinceEpoch}');
-        });
-      });
-    }, wakeup: true, rescheduleOnReboot: true);
 
-    Timer.periodic(const Duration(minutes: 20), (_) async {
+    Timer.periodic(const Duration(minutes: 10), (_) async {
       isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,
           defaultValue: false);
 
@@ -103,6 +87,13 @@ class SMSReceiverProvider extends ChangeNotifier {
         });
       });
     });
+  }
+  @pragma('vm:entry-point')
+  syncResult() async {
+    Repository.storeResultData(convertResultToMap(benId, benPhone));
+    SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
+    SharedUtils.setValue(SharedUtils.keySecond,
+        '${currentDateTime.millisecondsSinceEpoch}');
   }
 
   Future<Duration> getSyncDuration() async {
@@ -330,5 +321,21 @@ class Debounce {
       _timer?.cancel();
     }
     _timer = Timer(Duration(milliseconds: milliseconds), action);
+  }
+}
+
+class AlarmScheduler {
+  static Future<void> scheduleRepeatable() async {
+    await _periodicShot(0);
+  }
+
+  static Future<void> _periodicShot(int id) async {
+    await AndroidAlarmManager.periodic(
+      const Duration(minutes: 1),
+      id,
+      SMSReceiverProvider().syncResult,
+      wakeup: true,
+      rescheduleOnReboot: true,
+    );
   }
 }

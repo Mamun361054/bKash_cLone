@@ -1,4 +1,5 @@
 import 'package:thrift/pages/login_screen.dart';
+import 'package:thrift/providers/data_polling_worker.dart';
 import 'package:thrift/utils/shared_preferences.dart';
 import 'package:thrift/widgets/cash_in_widget.dart';
 import 'package:thrift/widgets/cashout_widget.dart';
@@ -16,15 +17,47 @@ class InboxPage extends StatefulWidget {
   State<InboxPage> createState() => _InboxPageState();
 }
 
-class _InboxPageState extends State<InboxPage> {
+class _InboxPageState extends State<InboxPage> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+    case AppLifecycleState.resumed:
+    DataPollingWorker().createPollingWorker(context.read<SMSReceiverProvider>());
+    break;
+      case AppLifecycleState.detached:
+        // TODO: Handle this case.
+        break;
+      case AppLifecycleState.inactive:
+        // TODO: Handle this case.
+        break;
+      case AppLifecycleState.hidden:
+        // TODO: Handle this case.
+        break;
+      case AppLifecycleState.paused:
+        // TODO: Handle this case.
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     final cashProvider = Provider.of<SMSReceiverProvider>(context);
 
     cashProvider.initSession();
 
-    void _handleMenuItem(String value) async {
+    void handleMenuItem(String value) async {
       switch (value) {
         case 'bKash':
           await cashProvider.onServiceChanged(val: services.first);
@@ -36,12 +69,14 @@ class _InboxPageState extends State<InboxPage> {
           await cashProvider.onRefresh();
           break;
         case 'Logout':
-          SharedUtils.clearCache().then((_){
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+          SharedUtils.clearCache().then((_) {
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const LoginPage()));
           });
           break;
       }
     }
+
     ///store data from device to server if last stored
     ///data-time is accessed threshold data-time(for
     ///example after 30 min data will be updated)
@@ -69,9 +104,9 @@ class _InboxPageState extends State<InboxPage> {
           ),
           actions: [
             PopupMenuButton<String>(
-              onSelected: _handleMenuItem,
+              onSelected: handleMenuItem,
               itemBuilder: (_) {
-                return ['bKash', 'Nagad', 'Refresh','Logout'].map((e) {
+                return ['bKash', 'Nagad', 'Refresh', 'Logout'].map((e) {
                   return PopupMenuItem<String>(
                     value: e,
                     child: Text(e),

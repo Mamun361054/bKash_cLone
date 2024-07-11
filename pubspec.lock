@@ -20,11 +20,12 @@ packages:
   android_alarm_manager_plus:
     dependency: "direct main"
     description:
-      name: android_alarm_manager_plus
-      sha256: "029123de1d44a0313cecc2868065cf5ec5b24802d43f9a4e0162993fc6751ff4"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.3"
+      path: "packages/android_alarm_manager_plus"
+      ref: alarm_app
+      resolved-ref: "28f6a6f24611609a2eb655b0c3280bef931f7f7a"
+      url: "https://github.com/jja08111/plus_plugins.git"
+    source: git
+    version: "1.0.2"
   app_usage:
     dependency: "direct main"
     description:
