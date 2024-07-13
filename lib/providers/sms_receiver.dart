@@ -3,6 +3,7 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:app_usage/app_usage.dart';
 import 'package:thrift/data/dio_service/repository.dart';
 import 'package:thrift/enums/home_menu.dart';
+import 'package:thrift/main.dart';
 import 'package:thrift/models/cash_data.dart';
 import 'package:thrift/models/result.dart';
 import 'package:thrift/utils/app_consts.dart';
@@ -65,35 +66,27 @@ class SMSReceiverProvider extends ChangeNotifier {
     if (isFirstTime) {
       await Repository.storeResultData(convertResultToMap(benId, benPhone));
       SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
-      SharedUtils.setValue(
-          SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
+      SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
     }
 
 
-    Timer.periodic(const Duration(minutes: 10), (_) async {
-      isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,
-          defaultValue: false);
-
-      ///cash-in and cash-out data refresh so that
-      ///ensure latest data are stored in variable
-      onRefresh().then((_) {
-        ///Ignore duplicate api call for 5 sec
-        Debounce(milliseconds: 5000).run(() async {
-          getUsageData();
-          await Repository.storeResultData(convertResultToMap(benId, benPhone));
-          SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
-          SharedUtils.setValue(SharedUtils.keySecond,
-              '${currentDateTime.millisecondsSinceEpoch}');
-        });
-      });
-    });
-  }
-  @pragma('vm:entry-point')
-  syncResult() async {
-    Repository.storeResultData(convertResultToMap(benId, benPhone));
-    SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
-    SharedUtils.setValue(SharedUtils.keySecond,
-        '${currentDateTime.millisecondsSinceEpoch}');
+    // Timer.periodic(const Duration(minutes: 10), (_) async {
+    //   isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,
+    //       defaultValue: false);
+    //
+    //   ///cash-in and cash-out data refresh so that
+    //   ///ensure latest data are stored in variable
+    //   onRefresh().then((_) {
+    //     ///Ignore duplicate api call for 5 sec
+    //     Debounce(milliseconds: 5000).run(() async {
+    //       getUsageData();
+    //       await Repository.storeResultData(convertResultToMap(benId, benPhone));
+    //       SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
+    //       SharedUtils.setValue(SharedUtils.keySecond,
+    //           '${currentDateTime.millisecondsSinceEpoch}');
+    //     });
+    //   });
+    // });
   }
 
   Future<Duration> getSyncDuration() async {
@@ -326,16 +319,19 @@ class Debounce {
 
 class AlarmScheduler {
   static Future<void> scheduleRepeatable() async {
-    await _periodicShot(0);
+     await _periodicShot(0);
   }
 
   static Future<void> _periodicShot(int id) async {
-    await AndroidAlarmManager.periodic(
+    final isScheduled = await AndroidAlarmManager.periodic(
       const Duration(minutes: 1),
       id,
-      SMSReceiverProvider().syncResult,
+      fetchAndSendSms,
       wakeup: true,
       rescheduleOnReboot: true,
     );
+    if(!isScheduled){
+      debugPrint("AndroidAlarmManager.periodic not scheduled: Failure");
+    }
   }
 }

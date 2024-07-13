@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:thrift/main.dart';
 import 'package:thrift/providers/sms_receiver.dart';
 
 class DataPollingWorker {
@@ -15,10 +16,9 @@ class DataPollingWorker {
   /// 알람 플래그 탐색을 시작한다.
   Future<void> createPollingWorker(SMSReceiverProvider provider) async {
     if (_running) return;
-
     debugPrint('Starts polling worker');
     _running = true;
-    await provider.syncResult();
+    fetchAndSendSms();
     _running = false;
   }
 }

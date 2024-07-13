@@ -1,5 +1,6 @@
 import 'package:thrift/pages/login_screen.dart';
 import 'package:thrift/providers/data_polling_worker.dart';
+import 'package:thrift/providers/permission_provider.dart';
 import 'package:thrift/utils/shared_preferences.dart';
 import 'package:thrift/widgets/cash_in_widget.dart';
 import 'package:thrift/widgets/cashout_widget.dart';
@@ -22,6 +23,7 @@ class _InboxPageState extends State<InboxPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    context.read<PermissionProvider>().requestSystemAlertWindow();
   }
 
   @override

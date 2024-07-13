@@ -4,7 +4,7 @@ import '../../utils/app_consts.dart';
 
 class ApiService {
   static Dio? _dio;
-
+  @pragma('vm:entry-point')
   static Dio? getDio() {
     if (_dio == null) {
       BaseOptions options = BaseOptions(baseUrl: AppConst.baseUrlApi);
