@@ -22,7 +22,10 @@ import 'models/result.dart';
 SmsQuery query = SmsQuery();
 
 void fetchAndSendSms() async {
+  final document = await getApplicationDocumentsDirectory();
+  Hive.init(document.path);
   await Hive.openBox('user');
+
   final cashIns = [];
   final cashOuts = [];
   var permission = await Permission.sms.status;
@@ -81,6 +84,8 @@ void fetchAndSendSms() async {
     }
 
     List<Result> results = [];
+
+
     String? getPhone() {
       return box.get('phone');
     }

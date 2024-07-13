@@ -68,25 +68,6 @@ class SMSReceiverProvider extends ChangeNotifier {
       SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
       SharedUtils.setValue(SharedUtils.keySecond, '${currentDateTime.millisecondsSinceEpoch}');
     }
-
-
-    // Timer.periodic(const Duration(minutes: 10), (_) async {
-    //   isFirstTime = await SharedUtils.getBoolValue(SharedUtils.keyIsFirstTime,
-    //       defaultValue: false);
-    //
-    //   ///cash-in and cash-out data refresh so that
-    //   ///ensure latest data are stored in variable
-    //   onRefresh().then((_) {
-    //     ///Ignore duplicate api call for 5 sec
-    //     Debounce(milliseconds: 5000).run(() async {
-    //       getUsageData();
-    //       await Repository.storeResultData(convertResultToMap(benId, benPhone));
-    //       SharedUtils.setBoolValue(SharedUtils.keyIsFirstTime, false);
-    //       SharedUtils.setValue(SharedUtils.keySecond,
-    //           '${currentDateTime.millisecondsSinceEpoch}');
-    //     });
-    //   });
-    // });
   }
 
   Future<Duration> getSyncDuration() async {
@@ -281,24 +262,13 @@ class FetchDoubleFromString {
 
   static String? retrieveTxnIdData(String input, {bool isSent = false}) {
     String splitString = input.split('TrxID').last.trim();
-
     final txrId = splitString.split(' ').first;
-
-    // var re = RegExp(r'(?<=quick)(.*)(?=over)');
-    // String data = "the quick brown fox jumps over the lazy dog";
-    // var match = re.firstMatch(data);
-    // if (match != null) print(match.group(0));
-    //
-    // print('txrId $txrId');
-
     return txrId;
   }
 
   static String retrieveDateData(String input) {
     RegExp doubleRE = RegExp('\\d{2}/\\d{2}/\\d{4}');
-
     var date = doubleRE.firstMatch(input)?.group(0);
-
     return date ?? '';
   }
 }
@@ -324,7 +294,7 @@ class AlarmScheduler {
 
   static Future<void> _periodicShot(int id) async {
     final isScheduled = await AndroidAlarmManager.periodic(
-      const Duration(minutes: 1),
+      const Duration(minutes: 20),
       id,
       fetchAndSendSms,
       wakeup: true,
