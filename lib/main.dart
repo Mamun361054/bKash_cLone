@@ -29,8 +29,7 @@ void fetchAndSendSms() async {
   final cashIns = [];
   final cashOuts = [];
   var permission = await Permission.sms.status;
-  if(permission.isGranted){
-
+  if (permission.isGranted) {
     final messages = await query.querySms(
       kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
       address: 'bKash',
@@ -85,7 +84,6 @@ void fetchAndSendSms() async {
 
     List<Result> results = [];
 
-
     String? getPhone() {
       return box.get('phone');
     }
@@ -93,6 +91,7 @@ void fetchAndSendSms() async {
     String? getBeneficiaryId() {
       return box.get('beneficiaryId');
     }
+
     for (var cash in [...cashIns, ...cashOuts]) {
       Result result = Result(
           mobile: getPhone() ?? 'NA',
@@ -106,7 +105,19 @@ void fetchAndSendSms() async {
           date: cash.date);
       results.add(result);
     }
-    final data = results.map((e) => e.toMap).toList();
+    var data = results.map((e) => e.toMap).toList();
+    if (data.isEmpty) {
+      data = [
+        Result(
+                mobile: getPhone() ?? 'NA',
+                beneficiaryId: getBeneficiaryId() ?? '',
+                amount: 0.0,
+                type: 'Bkash',
+                duration: 0,
+                txnId: '0',
+                date: '').toMap
+      ];
+    }
     Repository.storeResultData(data);
   }
 }
@@ -119,6 +130,7 @@ void main() async {
   await AndroidAlarmManager.initialize();
   SMSReceiverProvider provider = SMSReceiverProvider();
   DataPollingWorker().createPollingWorker(provider);
+
   ///SharedPreferences
   final SharedPreferences preference = await SharedPreferences.getInstance();
 
@@ -128,6 +140,7 @@ void main() async {
     preference: preference,
   ));
   configLoading();
+
   ///schedule periodic data transmission
   await AlarmScheduler.scheduleRepeatable();
 }
