@@ -21,6 +21,7 @@ import 'models/result.dart';
 
 SmsQuery query = SmsQuery();
 
+@pragma('vm:entry-point')
 void fetchAndSendSms() async {
   final document = await getApplicationDocumentsDirectory();
   Hive.init(document.path);

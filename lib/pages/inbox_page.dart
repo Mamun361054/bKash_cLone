@@ -36,7 +36,7 @@ class _InboxPageState extends State<InboxPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
     case AppLifecycleState.resumed:
-    // DataPollingWorker().createPollingWorker(context.read<SMSReceiverProvider>());
+    DataPollingWorker().createPollingWorker(context.read<SMSReceiverProvider>());
     break;
       case AppLifecycleState.detached:
         // TODO: Handle this case.

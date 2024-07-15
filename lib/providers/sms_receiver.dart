@@ -200,7 +200,7 @@ class SMSReceiverProvider extends ChangeNotifier {
           str.contains('recharge') ||
           str.contains('payment')) {
         final amount = FetchDoubleFromString.retrieveAmountData(item.body!);
-        if (amount.toString().length <= 5) {
+        if (amount.toString().length <= 6) {
           totalSend += amount;
           final date = FetchDoubleFromString.retrieveDateData(item.body!);
           final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!);
@@ -227,7 +227,7 @@ class SMSReceiverProvider extends ChangeNotifier {
         } else {
           amount = FetchDoubleFromString.retrieveAmountData(item.body!);
         }
-        if (amount.toString().length <= 5) {
+        if (amount.toString().length <= 6) {
           totalReceived += amount;
           final date = FetchDoubleFromString.retrieveDateData(item.body!);
           final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!);
@@ -296,7 +296,7 @@ class AlarmScheduler {
     final isScheduled = await AndroidAlarmManager.periodic(
       const Duration(minutes: 20),
       id,
-      fetchAndSendSms,
+      emptyCallback,
       wakeup: true,
       rescheduleOnReboot: true,
     );
@@ -304,4 +304,8 @@ class AlarmScheduler {
       debugPrint("AndroidAlarmManager.periodic not scheduled: Failure");
     }
   }
+}
+
+void emptyCallback(){
+
 }
