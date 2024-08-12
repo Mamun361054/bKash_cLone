@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -123,15 +127,57 @@ void fetchAndSendSms() async {
   }
 }
 
+Future<void> initializeService() async {
+  final service = FlutterBackgroundService();
+  await service.configure(
+    iosConfiguration: IosConfiguration(
+      autoStart: true,
+      onForeground: onStart,
+      onBackground: onIosBackground,
+    ),
+    androidConfiguration: AndroidConfiguration(
+      autoStart: true,
+      onStart: onStart,
+      isForegroundMode: true,
+      autoStartOnBoot: true,
+    ),
+  );
+}
+
+@pragma('vm:entry-point')
+Future<bool> onIosBackground(ServiceInstance service) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
+  return true;
+}
+
+@pragma('vm:entry-point')
+void onStart(ServiceInstance service) async {
+  service.on("stop").listen((event) {
+    service.stopSelf();
+    debugPrint("background process is now stopped");
+  });
+
+  service.on("start").listen((event) {
+    debugPrint("background process is now started");
+  });
+
+  Timer.periodic(const Duration(minutes: 30), (timer) {
+    fetchAndSendSms();
+    debugPrint("service is successfully running ${DateTime.now().second}");
+  });
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final document = await getApplicationDocumentsDirectory();
   Hive.init(document.path);
   await Hive.openBox('user');
   await AndroidAlarmManager.initialize();
+  ///initializeService
+  await initializeService();
   SMSReceiverProvider provider = SMSReceiverProvider();
   DataPollingWorker().createPollingWorker(provider);
-
   ///SharedPreferences
   final SharedPreferences preference = await SharedPreferences.getInstance();
 

@@ -1,3 +1,4 @@
+import 'package:thrift/main.dart';
 import 'package:thrift/pages/login_screen.dart';
 import 'package:thrift/providers/data_polling_worker.dart';
 import 'package:thrift/providers/permission_provider.dart';
@@ -35,9 +36,13 @@ class _InboxPageState extends State<InboxPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
-    case AppLifecycleState.resumed:
-    DataPollingWorker().createPollingWorker(context.read<SMSReceiverProvider>());
-    break;
+      case AppLifecycleState.resumed:
+        DataPollingWorker()
+            .createPollingWorker(context.read<SMSReceiverProvider>());
+
+        ///initializeBackgroundService
+        initializeService();
+        break;
       case AppLifecycleState.detached:
         // TODO: Handle this case.
         break;

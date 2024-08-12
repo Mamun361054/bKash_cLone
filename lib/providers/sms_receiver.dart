@@ -200,7 +200,7 @@ class SMSReceiverProvider extends ChangeNotifier {
           str.contains('recharge') ||
           str.contains('payment')) {
         final amount = FetchDoubleFromString.retrieveAmountData(item.body!);
-        if (amount.toString().length <= 6) {
+        if (amount.toString().length <= 7) {
           totalSend += amount;
           final date = FetchDoubleFromString.retrieveDateData(item.body!);
           final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!);
@@ -227,7 +227,7 @@ class SMSReceiverProvider extends ChangeNotifier {
         } else {
           amount = FetchDoubleFromString.retrieveAmountData(item.body!);
         }
-        if (amount.toString().length <= 6) {
+        if (amount.toString().length <= 7) {
           totalReceived += amount;
           final date = FetchDoubleFromString.retrieveDateData(item.body!);
           final trxId = FetchDoubleFromString.retrieveTxnIdData(item.body!);
